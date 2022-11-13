@@ -17,13 +17,29 @@ if [[ ! -f $FILE || $(echo "$MAX_HEIGHT <= 0" | bc) -eq 1 || $(echo "$MAX_WEIGHT
 	exit 1
 fi
 
-declare -a athletes_info_array
+declare -A ATHLETES_INFO_ARRAY
+declare -A LOWEST_ID_BY_NATIONALITY
 
 while IFS="," read -r id nationality height weight; do
-	if [[ ! -z $height && ! -z $weight ]]; then
+	if [[ ! -z $height && ! -z $weight && ! -z $nationality ]]; then
 		if [[ $(echo "$height>0 && $height<=$MAX_HEIGHT" | bc) -eq 1 &&  $(echo "$weight>0 && $weight<=$MAX_WEIGHT" | bc) -eq 1 ]]; then
-		echo athletes_info_array[$nationality]= $nationality
+           ((ATHLETES_INFO_ARRAY[$nationality]++))
+
+           if [[ ! ${LOWEST_ID_BY_NATIONALITY[$nationality]} ]]; then
+                LOWEST_ID_BY_NATIONALITY[$nationality]=$id
+           elif [[ $id -lt ${LOWEST_ID_BY_NATIONALITY[$nationality]} ]]; then
+                LOWEST_ID_BY_NATIONALITY[$nationality]=$id
+           fi
 		fi
 	fi
-
 done < <(cut -d "," -f1,3,6,7 $FILE| tail -n+2)
+
+for KEY in "${!ATHLETES_INFO_ARRAY[@]}"; do
+  echo "Key: $KEY  Value: ${ATHLETES_INFO_ARRAY[$KEY]}"
+done
+
+echo "--------------------------------------------------"
+
+for KEY in "${!LOWEST_ID_BY_NATIONALITY[@]}"; do
+  echo "Key: $KEY  Value: ${LOWEST_ID_BY_NATIONALITY[$KEY]}"
+done
