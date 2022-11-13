@@ -25,9 +25,7 @@ while IFS="," read -r id nationality height weight; do
 		if [[ $(echo "$height>0 && $height<=$MAX_HEIGHT" | bc) -eq 1 &&  $(echo "$weight>0 && $weight<=$MAX_WEIGHT" | bc) -eq 1 ]]; then
            ((ATHLETES_INFO_ARRAY[$nationality]++))
 
-           if [[ ! ${LOWEST_ID_BY_NATIONALITY[$nationality]} ]]; then
-                LOWEST_ID_BY_NATIONALITY[$nationality]=$id
-           elif [[ $id -lt ${LOWEST_ID_BY_NATIONALITY[$nationality]} ]]; then
+           if [[ ! ${LOWEST_ID_BY_NATIONALITY[$nationality]} || $id -lt ${LOWEST_ID_BY_NATIONALITY[$nationality]} ]]; then
                 LOWEST_ID_BY_NATIONALITY[$nationality]=$id
            fi
 		fi
